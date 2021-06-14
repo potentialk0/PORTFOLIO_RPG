@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8950716d5d751e4ea16087e94962725, type: 3}
+  m_Name: Blue Mage Gloves
+  m_EditorClassIdentifier: 
+  _itemType: 0
+  _id: 6
+  _name: Blue Mage Gloves
+  _sprite: {fileID: 21300000, guid: dc3b9ad39aca6064f9cf46f90bdc80d8, type: 3}
+  _model: {fileID: 0}
+  _description: 
+  _equipmentType: 2
+  _statModifiers:
+  - _statType: 4
+    _modValue: 5
+  - _statType: 5
+    _modValue: 3
