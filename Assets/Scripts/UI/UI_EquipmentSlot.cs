@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UI_EquipmentSlot : MonoBehaviour
 {
-    EquipmentHolder _equipmentHolder;
+    [SerializeField] Image _itemImage;
 
     // Start is called before the first frame update
     void Start()
@@ -20,12 +21,14 @@ public class UI_EquipmentSlot : MonoBehaviour
 
     void Init()
 	{
-        _equipmentHolder = GameObject.FindGameObjectWithTag("Player").GetComponent<EquipmentHolder>();
-        EquipmentHolder.changeEquipmentUI += RefreshUI;
+        _itemImage = GetComponentsInChildren<Image>()[1];
     }
 
-    void RefreshUI()
-	{
-
-	}
+    public void SetItem(ItemData newItem)
+    {
+        if (newItem == null)
+            _itemImage.sprite = null;
+        else
+            _itemImage.sprite = newItem._sprite;
+    }
 }

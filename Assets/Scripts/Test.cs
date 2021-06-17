@@ -37,6 +37,11 @@ public class Test : MonoBehaviour
 		{
             _equipmentHolder.Equip((EquipmentData)_testItem);
 		}
+
+        if(Input.GetKeyDown(KeyCode.Alpha3))
+		{
+            _equipmentHolder.UnEquip(EquipmentType.Helmet);
+		}
     }
 
     IEnumerator Repeat()

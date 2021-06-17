@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[Serializable]
 public class EquipmentSlot
 {
     [SerializeField] public EquipmentData _equipmentData;

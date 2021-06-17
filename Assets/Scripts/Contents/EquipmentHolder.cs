@@ -9,10 +9,16 @@ public class EquipmentHolder : MonoBehaviour
     public delegate void ChangeEquipmentUI();
     public static event ChangeEquipmentUI changeEquipmentUI;
 
-    public delegate void ChangeEquipmentStat(EquipmentData equipmentData);
-    public static event ChangeEquipmentStat changeEquipmentStat;
+    // statcontainer의 _stats[]에 전달
+	public delegate void OnEquip(EquipmentData equipmentData);
+	public static event OnEquip onEquip;
 
-    [SerializeField] public EquipmentSlot[] _equipmentSlots;
+	public delegate void OnUnEquip(EquipmentType equipmentType);
+	public static event OnUnEquip onUnEquip;
+
+	[SerializeField] EquipmentSlot[] _equipmentSlots;
+    public EquipmentSlot[] EquipmentSlots { get { return _equipmentSlots; } }
+
     [SerializeField] StatContainer _statContainer;
 
     // Start is called before the first frame update
@@ -49,11 +55,32 @@ public class EquipmentHolder : MonoBehaviour
                 if (_equipmentSlots[i]._equipmentData == equipment) return;
 
                 _equipmentSlots[i].EquipmentData = equipment;
-                changeEquipmentUI();
-                changeEquipmentStat(equipment);
+
+                if(onEquip != null)
+                    onEquip(equipment);
+
+                if (changeEquipmentUI != null)
+                    changeEquipmentUI();
 
                 return;
 			}
 		}
 	}
+
+    public void UnEquip(EquipmentType equipmentType)
+	{
+        if(onUnEquip != null)
+            onUnEquip(equipmentType);
+
+        _equipmentSlots[(int)equipmentType].EquipmentData = null;
+
+        if(changeEquipmentUI != null)
+            changeEquipmentUI();
+	}
+
+    public EquipmentData GetEquipmentData(EquipmentType equipmentType)
+	{
+        return EquipmentSlots[(int)equipmentType].EquipmentData;
+
+    }
 }

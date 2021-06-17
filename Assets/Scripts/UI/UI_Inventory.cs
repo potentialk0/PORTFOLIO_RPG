@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class UI_Inventory : MonoBehaviour
 {
-    [SerializeField] GameObject _slotHolder;
-    [SerializeField] UI_InventorySlot[] _slotsUI;
+    [SerializeField] GameObject _inventorySlotHolder;
+    [SerializeField] UI_InventorySlot[] _inventorySlotsUI;
     [SerializeField] Inventory _inventory;
 
     // Start is called before the first frame update
@@ -22,13 +22,14 @@ public class UI_Inventory : MonoBehaviour
 
 	void Init()
 	{
+        _inventorySlotHolder = GameObject.Find("InventorySlotHolder");
+        _inventorySlotsUI = _inventorySlotHolder.GetComponentsInChildren<UI_InventorySlot>();
         _inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
-        _slotHolder = GameObject.Find("SlotHolder");
-        _slotsUI = _slotHolder.GetComponentsInChildren<UI_InventorySlot>();
-        for(int i = 0; i < _slotsUI.Length; i++)
+
+        for(int i = 0; i < _inventorySlotsUI.Length; i++)
         {
             string n = $"InventorySlot[{i + 1}]";
-            _slotsUI[i].name = n;
+            _inventorySlotsUI[i].name = n;
         }
 
         Inventory.onInventoryChange += RefreshUI;
@@ -37,9 +38,57 @@ public class UI_Inventory : MonoBehaviour
     // 아이템 획득 시 인벤토리(_slots) 업데이트
     public void RefreshUI()
 	{
-        for(int i = 0; i < _slotsUI.Length; i++)
+        for(int i = 0; i < _inventorySlotsUI.Length; i++)
 		{
-            _slotsUI[i].SetItem(_inventory.InventorySlots[i].Item);
+            _inventorySlotsUI[i].SetItem(_inventory.InventorySlots[i].Item);
 		}
 	}
+
+	#region Animation
+
+    [SerializeField] float _moveSpeed = 3000f;
+    [SerializeField] bool _isEnabled = false;
+
+	public void Enable()
+	{
+        if (_isEnabled) return;
+        _isEnabled = true;
+        StartCoroutine(EnableUI());
+	}
+
+    public void Disable()
+	{
+        if (!_isEnabled) return;
+        _isEnabled = false;
+        StartCoroutine(DisableUI());
+	}
+
+    IEnumerator EnableUI()
+	{
+        RectTransform rect = GetComponent<RectTransform>();
+
+        while(rect.anchoredPosition.x >= 260)
+		{
+            transform.position -= transform.right * _moveSpeed * Time.deltaTime;
+            yield return null;
+		}
+
+        if (rect.anchoredPosition.x < 260)
+            rect.anchoredPosition = new Vector2(260, rect.anchoredPosition.y);
+	}
+
+    IEnumerator DisableUI()
+	{
+        RectTransform rect = GetComponent<RectTransform>();
+
+        while(rect.anchoredPosition.x <= 540)
+		{
+            transform.position += transform.right * _moveSpeed * Time.deltaTime;
+            yield return null;
+		}
+
+        if (rect.anchoredPosition.x > 540)
+            rect.anchoredPosition = new Vector2(540, rect.anchoredPosition.y);
+    }
+	#endregion
 }

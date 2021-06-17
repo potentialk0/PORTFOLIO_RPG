@@ -10,7 +10,7 @@ public class UI_InventorySlot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _itemImage = GetComponentsInChildren<Image>()[1];
+        Init();
     }
 
     // Update is called once per frame
@@ -18,6 +18,11 @@ public class UI_InventorySlot : MonoBehaviour
     {
         
     }
+
+    void Init()
+	{
+        _itemImage = GetComponentsInChildren<Image>()[1];
+	}
 
     public void SetItem(ItemData newItem)
 	{

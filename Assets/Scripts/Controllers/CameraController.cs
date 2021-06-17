@@ -4,11 +4,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField]
-    GameObject _player = null;
-
-    [SerializeField]
-    Vector3 _delta = new Vector3();
+    [SerializeField] GameObject _player = null;
+    [SerializeField] Vector3 _delta = new Vector3();
 
     // Start is called before the first frame update
     void Start()

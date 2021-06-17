@@ -24,8 +24,10 @@ public class Stat
         CalculateCurrentValue();
     }
 
-    public void RemoveModifier(StatModifier statModifier, object source)
+    public void RemoveModifier(object source)
     {
+        if (source == null) return;
+
         for (int i = _statModifiers.Count - 1; i >= 0; i--)
         {
             if (_statModifiers[i]._source == source)
