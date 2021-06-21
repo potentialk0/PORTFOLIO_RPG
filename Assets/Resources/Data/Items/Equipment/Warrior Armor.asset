@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 4
   _name: Warrior Armor
-  _sprite: {fileID: 21300000, guid: 9bf1293a88ec3e541adbb3836e562574, type: 3}
+  _itemImage: {fileID: 21300000, guid: 9bf1293a88ec3e541adbb3836e562574, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 1

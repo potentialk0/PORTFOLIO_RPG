@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 14
   _name: Basic Helmet
-  _sprite: {fileID: 21300000, guid: f0a26317d76d31b46bbcd4deeb6cc605, type: 3}
+  _itemImage: {fileID: 21300000, guid: f0a26317d76d31b46bbcd4deeb6cc605, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 0

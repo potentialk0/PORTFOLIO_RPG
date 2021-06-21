@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 8
   _name: Red Mage Gloves
-  _sprite: {fileID: 21300000, guid: cfa0ec4b2d2964b4c9a186faae18b77a, type: 3}
+  _itemImage: {fileID: 21300000, guid: cfa0ec4b2d2964b4c9a186faae18b77a, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 2

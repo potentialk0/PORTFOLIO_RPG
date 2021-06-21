@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 6
   _name: Blue Mage Gloves
-  _sprite: {fileID: 21300000, guid: dc3b9ad39aca6064f9cf46f90bdc80d8, type: 3}
+  _itemImage: {fileID: 21300000, guid: dc3b9ad39aca6064f9cf46f90bdc80d8, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 2

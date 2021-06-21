@@ -17,9 +17,9 @@ public class StatModifier
         _source = source;
     }
 
-    public string StatName(StatType stattype)
+    public string StatName()
 	{
-        switch(stattype)
+        switch(_statType)
 		{
             case StatType.MaxHP:
                 return "체력";
@@ -45,5 +45,10 @@ public class StatModifier
             default:
                 return "";
         }
+	}
+
+    public float StatValue()
+	{
+        return _modValue;
 	}
 }

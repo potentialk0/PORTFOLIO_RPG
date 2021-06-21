@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 9
   _name: Blue Mage Cloak
-  _sprite: {fileID: 21300000, guid: a1d240c2d307151439a6c9a916605016, type: 3}
+  _itemImage: {fileID: 21300000, guid: a1d240c2d307151439a6c9a916605016, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 1

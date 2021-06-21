@@ -29,6 +29,6 @@ public class UI_EquipmentSlot : MonoBehaviour
         if (newItem == null)
             _itemImage.sprite = null;
         else
-            _itemImage.sprite = newItem._sprite;
+            _itemImage.sprite = newItem._itemImage;
     }
 }

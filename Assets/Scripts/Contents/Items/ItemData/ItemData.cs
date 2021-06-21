@@ -19,7 +19,7 @@ public abstract class ItemData : ScriptableObject
     [SerializeField] public ItemType _itemType = ItemType.Default;
     [SerializeField] public int _id;
     [SerializeField] public string _name;
-    [SerializeField] public Sprite _sprite;
+    [SerializeField] public Sprite _itemImage;
     [SerializeField] public GameObject _model;
     [SerializeField] [TextArea(5, 20)] public string _description;
 

@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 12
   _name: Basic Gloves
-  _sprite: {fileID: 21300000, guid: 10d699fe7b7390c438fc671220e0f36a, type: 3}
+  _itemImage: {fileID: 21300000, guid: 10d699fe7b7390c438fc671220e0f36a, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 2

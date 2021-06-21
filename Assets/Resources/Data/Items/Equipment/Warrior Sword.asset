@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 7
   _name: Warrior Sword
-  _sprite: {fileID: 21300000, guid: 582b5f62a7ac7cb41b0f9e7c1ce1158c, type: 3}
+  _itemImage: {fileID: 21300000, guid: 582b5f62a7ac7cb41b0f9e7c1ce1158c, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 3

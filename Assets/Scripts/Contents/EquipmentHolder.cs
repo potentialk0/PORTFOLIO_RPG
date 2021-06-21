@@ -81,6 +81,16 @@ public class EquipmentHolder : MonoBehaviour
     public EquipmentData GetEquipmentData(EquipmentType equipmentType)
 	{
         return EquipmentSlots[(int)equipmentType].EquipmentData;
-
     }
+
+    public EquipmentSlot GetEquipmentSlot(EquipmentType equipmentType)
+	{
+        for(int i = 0; i < _equipmentSlots.Length; i++)
+		{
+            if (_equipmentSlots[i]._equipmentType == equipmentType)
+                return _equipmentSlots[i];
+		}
+
+        return null;
+	}
 }

@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 2
   _name: Red Mage Staff
-  _sprite: {fileID: 21300000, guid: b14370c9a1cc34b4f99b5f511bff93d3, type: 3}
+  _itemImage: {fileID: 21300000, guid: b14370c9a1cc34b4f99b5f511bff93d3, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 3

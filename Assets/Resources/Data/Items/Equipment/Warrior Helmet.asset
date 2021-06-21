@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 15
   _name: Warrior Helmet
-  _sprite: {fileID: 21300000, guid: 4ac3874c6680581498dac82c75a7582f, type: 3}
+  _itemImage: {fileID: 21300000, guid: 4ac3874c6680581498dac82c75a7582f, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 0

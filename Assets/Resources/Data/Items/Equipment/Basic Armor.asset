@@ -15,7 +15,7 @@ MonoBehaviour:
   _itemType: 0
   _id: 11
   _name: Basic Armor
-  _sprite: {fileID: 21300000, guid: e5336d86b2af4764b8d4c53e6f0ba559, type: 3}
+  _itemImage: {fileID: 21300000, guid: e5336d86b2af4764b8d4c53e6f0ba559, type: 3}
   _model: {fileID: 0}
   _description: 
   _equipmentType: 1

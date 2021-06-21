@@ -14,7 +14,6 @@ public class ItemManager
 		if (_isInit == false)
 		{
 			object[] tempLoad = Resources.LoadAll("Data/Items");
-			Debug.Log($"Temp Length : {tempLoad.Length}");
 
 			_itemData = new Dictionary<int, ItemData>();
 
@@ -25,6 +24,8 @@ public class ItemManager
 				_itemData[t._id]._name = _itemData[t._id].name;
 			}
 			_isInit = true;
+
+			if (_itemData.Count == 0) Debug.Log("Items Not Loaded Properly");
 		}
 	}
 }

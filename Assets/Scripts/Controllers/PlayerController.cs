@@ -49,6 +49,25 @@ public class PlayerController : MonoBehaviour
         UpdateClick();
         ProcessState();
     }
+    void ProcessState()
+    {
+        //Debug.Log(_state);
+        switch (_state)
+        {
+            case PlayerState.Idle:
+                UpdateIdle();
+                break;
+            case PlayerState.Move:
+                UpdateMove();
+                break;
+            case PlayerState.Combat:
+                UpdateCombat();
+                break;
+            case PlayerState.Dead:
+                UpdateDead();
+                break;
+        }
+    }
 
     public void ChangeState(PlayerState s)
     {
@@ -68,26 +87,6 @@ public class PlayerController : MonoBehaviour
                 break;
             case PlayerState.Dead:
                 _state = PlayerState.Dead;
-                break;
-        }
-    }
-
-    void ProcessState()
-    {
-        Debug.Log(_state);
-        switch (_state)
-        {
-            case PlayerState.Idle:
-                UpdateIdle();
-                break;
-            case PlayerState.Move:
-                UpdateMove();
-                break;
-            case PlayerState.Combat:
-                UpdateCombat();
-                break;
-            case PlayerState.Dead:
-                UpdateDead();
                 break;
         }
     }
