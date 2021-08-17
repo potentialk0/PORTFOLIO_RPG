@@ -8,16 +8,10 @@ public class Managers : MonoBehaviour
     public static Managers Instance { get { Init(); return _instance; } }
 
     PlayerController _player;
-    SpawnManager _spawner = new SpawnManager();
     ItemManager _item = new ItemManager();
-    SkillManager _skills = new SkillManager();
-    PoolManager _pool = new PoolManager();
 
     public static PlayerController Player { get { return Instance._player; } }
-    public static SpawnManager Spawner { get { return Instance._spawner; } }
     public static ItemManager Item { get { return Instance._item; } }
-    public static SkillManager Skills { get { return Instance._skills; } }
-    public static PoolManager Pool { get { return Instance._pool; } }
 
     void Awake()
 	{
@@ -51,6 +45,5 @@ public class Managers : MonoBehaviour
         _instance = go.GetComponent<Managers>();
 
         _instance._item.Init();
-        _instance._pool.Init();
     }
 }
