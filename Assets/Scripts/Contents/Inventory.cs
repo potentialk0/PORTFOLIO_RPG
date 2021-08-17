@@ -12,6 +12,8 @@ public class Inventory : MonoBehaviour
 
     [SerializeField] int _slotNum;
 
+    [SerializeField] UI_ItemShortcutSlot _itemShortcutSlot;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -52,9 +54,22 @@ public class Inventory : MonoBehaviour
 
 		for (int i = 0; i < _inventorySlots.Length; i++)
 		{
+            if(_inventorySlots[i].Item == item && item._isStackable == true)
+			{
+                _inventorySlots[i]._stackableAmount++;
+                _itemShortcutSlot.SetInventorySlot(_inventorySlots[i]);
+                break;
+			}
+
 			if (_inventorySlots[i]._item == null)
 			{
 				_inventorySlots[i]._item = item;
+
+                if (_inventorySlots[i].Item._isStackable)
+                {
+                    _inventorySlots[i]._stackableAmount = 1;
+                    _itemShortcutSlot.SetInventorySlot(_inventorySlots[i]);
+                }
 				break;
 			}
 		}
@@ -62,4 +77,10 @@ public class Inventory : MonoBehaviour
         if (onInventoryChange != null)
             onInventoryChange();
 	}
+
+    public void InventoryChange()
+	{
+        if (onInventoryChange != null)
+            onInventoryChange();
+    }
 }

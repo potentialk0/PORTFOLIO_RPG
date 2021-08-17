@@ -21,7 +21,7 @@ public class ItemManager
 			{
 				ItemData t = tempLoad[i] as ItemData;
 				_itemData[t._id] = t;
-				_itemData[t._id]._name = _itemData[t._id].name;
+				_itemData[t._id]._id = i;
 			}
 			_isInit = true;
 

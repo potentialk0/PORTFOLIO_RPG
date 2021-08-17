@@ -21,4 +21,9 @@ public class CameraController : MonoBehaviour
         transform.position = _player.transform.position + _delta;
         transform.LookAt(_player.transform.position);
     }
+
+    public void Shake()
+	{
+
+	}
 }

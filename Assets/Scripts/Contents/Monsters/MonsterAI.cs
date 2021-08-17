@@ -11,6 +11,7 @@ public enum MonsterState
     BattleIdle,
     Attack,
     Dead,
+    KnockBack,
     Num,
 }
 
@@ -19,8 +20,11 @@ public class MonsterAI : MonoBehaviour
     protected Animator _animator;
 
     [SerializeField] protected MonsterState _state;
+    public MonsterState State { get { return _state; } }
 
     protected Vector3 _spawnPoint;
+    [SerializeField] protected Spawner _spawner;
+    [SerializeField] protected PoolType _pooltype;
 
     // 이동
     protected NavMeshPath _navMeshPath;
@@ -57,14 +61,24 @@ public class MonsterAI : MonoBehaviour
     protected float _dieAnimTimer = 0;
     protected float _dieAnimLength;
     protected Material _material;
-    protected float _fadeSpeed = 0.3f;
+    protected float _fadeSpeed = 0.6f;
 
+    protected float _knockbackSpeed = 20f;
+    protected float _knockbackTime = 0.1f;
+    protected float _knockbackTimer = 0;
+    protected float _knockbackAnimLength;
+
+    [Header("Crossfade Value-------------------------")]
     [SerializeField] protected float _crossFadeIdle;
     [SerializeField] protected float _crossFadeRoam;
     [SerializeField] protected float _crossFadeChase;
     [SerializeField] protected float _crossFadeBattleIdle;
     [SerializeField] protected float _crossFadeAttack;
     [SerializeField] protected float _crossFadeDie;
+    [SerializeField] protected float _crossFadeKnockback;
+    [SerializeField] protected AnimationClip[] _animClips;
+
+    [SerializeField] UI_Player _playerUI;
 
     // Start is called before the first frame update
     protected void Start()
@@ -78,33 +92,28 @@ public class MonsterAI : MonoBehaviour
         _playerStat = GameObject.FindGameObjectWithTag("Player").GetComponent<StatContainer>();
         _monsterStat = GetComponent<StatContainer>();
 
-        _attackAnimCooltime = _animator.runtimeAnimatorController.animationClips[0].length;
+        _attackAnimCooltime = _animator.runtimeAnimatorController.animationClips[3].length;
         _attackCooltime = _attackCooltime - _attackAnimCooltime;
-
-        _dieAnimLength = _animator.runtimeAnimatorController.animationClips[5].length;
+        _dieAnimLength = _animator.runtimeAnimatorController.animationClips[6].length;
         _material = GetComponentInChildren<SkinnedMeshRenderer>().material;
+
+        _knockbackAnimLength = _animator.runtimeAnimatorController.animationClips[5].length;
+
+        _animClips = _animator.runtimeAnimatorController.animationClips;
+
+        _playerUI = GameObject.Find("PlayerUI").GetComponent<UI_Player>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Test();
         ProcessState();
-    }
-
-    void Test()
-	{
-        if (Input.GetKeyDown(KeyCode.R))
-            ChangeState(MonsterState.Chase);
-        if (Input.GetKeyDown(KeyCode.T))
-            ChangeState(MonsterState.Roam);
-        if (Input.GetKeyDown(KeyCode.Q))
-            ChangeState(MonsterState.Dead);
     }
 
     void ProcessState()
 	{
         CheckIsDead();
+        //CheckIsHit();
         switch (_state)
         {
             case MonsterState.Idle:
@@ -124,6 +133,9 @@ public class MonsterAI : MonoBehaviour
                 break;
             case MonsterState.Dead:
                 UpdateDie();
+                break;
+            case MonsterState.KnockBack:
+                UpdateKnockback();
                 break;
         }
     }
@@ -157,21 +169,57 @@ public class MonsterAI : MonoBehaviour
                 _state = MonsterState.Attack;
                 break;
             case MonsterState.Dead:
+                _player.GetComponent<PlayerController>().EmptyTarget();
+                RemoveTargetMark();
+                AddQuestCount();
+                GetComponent<ItemDroppable>().DropItem();
                 _animator.CrossFade("DIE", _crossFadeDie);
                 _state = MonsterState.Dead;
+                break;
+            case MonsterState.KnockBack:
+                _animator.CrossFade("GETHIT", _crossFadeKnockback);
+                StartCoroutine(StartKnockback());
+                _state = MonsterState.KnockBack;
                 break;
         }
 	}
 
-	#region UpdateIdle
-	void UpdateIdle()
-	{
-        //if (공격받으면)
-        //{
-        //    ChangeState(MonsterState.Chase);
-        //    return;
-        //}
+    void CheckIsDead()
+    {
+        if (_monsterStat.CurrHP <= 0)
+            ChangeState(MonsterState.Dead);
+    }
 
+    public void OnGetHit()
+	{
+        if (_state != MonsterState.Dead)
+		{
+            ChangeState(MonsterState.Chase);
+		}
+	}
+
+    public void OnKnockBack()
+	{
+        if (_state != MonsterState.Dead)
+        {
+            transform.forward = -_player.transform.forward;
+            ChangeState(MonsterState.KnockBack);
+        }
+	}
+
+    public void SetSpawner(Spawner spawner)
+	{
+        _spawner = spawner;
+	}
+
+    public void SetPooltype(PoolType pooltype)
+	{
+        _pooltype = pooltype;
+	}
+
+    #region UpdateIdle
+    void UpdateIdle()
+	{
         _idleTimer += Time.deltaTime;
         if (_idleTimer > _idleTime)
         {
@@ -185,12 +233,6 @@ public class MonsterAI : MonoBehaviour
     #region UpdateRoam
     void UpdateRoam()
 	{
-        //if (공격받으면)
-        //{
-        //    ChangeState(MonsterState.Chase);
-        //    return;
-        //}
-
         // 중립 몬스터 : 공격당하면 state == combat
         // 호전적 몬스터 : 시야 범위 내에 player가 들어오면 state == combat
         if (HasArrivedTo(_roamPosition))
@@ -237,6 +279,8 @@ public class MonsterAI : MonoBehaviour
     #region UpdateBattleIdle
     void UpdateBattleIdle()
     {
+        LookAtTarget(_player.transform.position);
+
         if (!IsInAttackRange())
         {
             ChangeState(MonsterState.Chase);
@@ -270,8 +314,13 @@ public class MonsterAI : MonoBehaviour
 
         if(!IsInAttackRange())
 		{
-            ChangeState(MonsterState.Chase);
-            return;
+            if (_attackAnimTimer >= _attackAnimCooltime)
+            {
+                ChangeState(MonsterState.Chase);
+                return;
+            }
+            else
+                _attackAnimTimer += Time.deltaTime;
 		}
         else
         {
@@ -285,9 +334,10 @@ public class MonsterAI : MonoBehaviour
         }
 	}
 
-    void Damage()
+    void SlimeAttackTrigger()
 	{
-        _playerStat.GetDamage(_monsterStat);
+        _playerStat.GetDamageFrom(_monsterStat);
+        _playerUI.RefreshHP();
 	}
     #endregion
 
@@ -304,7 +354,44 @@ public class MonsterAI : MonoBehaviour
             _material.color = temp;
 
             if (fade <= 0)
-                Destroy(gameObject);
+            {
+                _spawner.RemoveObject(gameObject);
+                Pools.Instance.PoolDict[_pooltype].Enqueue(gameObject);
+            }
+		}
+	}
+
+    public void RemoveTargetMark()
+	{
+        GameObject go = GetComponentInChildren<TargetMark>().gameObject;
+        Pools.Instance.PoolDict[PoolType.TargetMark].Enqueue(go, true);
+	}
+
+    void AddQuestCount()
+	{
+        GetComponent<QuestCountable>().AddQuestCount();
+	}
+	#endregion
+
+	#region UpdateKnockback
+	void UpdateKnockback()
+	{
+        _knockbackTimer += Time.deltaTime;
+        if (_knockbackTimer >= _knockbackAnimLength)
+        {
+            _knockbackTimer = 0;
+            ChangeState(MonsterState.Chase);
+        }
+    }
+
+    IEnumerator StartKnockback()
+	{
+        float timer = 0;
+        while(timer <= _knockbackTime)
+		{
+            yield return null;
+            timer += Time.deltaTime;
+            transform.position -= transform.forward.normalized * _knockbackSpeed * Time.deltaTime;
 		}
 	}
     #endregion
@@ -327,7 +414,10 @@ public class MonsterAI : MonoBehaviour
             _targetPos = _corners[_cornerNum];
             LookAtTarget(_targetPos);
             if (!HasArrivedTo(_destination) && HasArrivedTo(_corners[_cornerNum]))
-                _cornerNum++;
+            {
+                if(_cornerNum <= _corners.Length - 1)
+                    _cornerNum++;
+            }
             else if (!HasArrivedTo(_destination))
                 transform.position += (_corners[_cornerNum] - transform.position).normalized * Time.deltaTime * _moveSpeed;
         }
@@ -348,11 +438,7 @@ public class MonsterAI : MonoBehaviour
             return true;
         return false;
     }
-    void CheckIsDead()
-    {
-        if (_monsterStat.CurrHP <= 0)
-            ChangeState(MonsterState.Dead);
-    }
+    
 
     void ResetAnimtime()
     {

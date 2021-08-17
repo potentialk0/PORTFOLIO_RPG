@@ -22,6 +22,11 @@ public class UI_Inventory : MonoBehaviour
 
 	void Init()
 	{
+        for(int i = 0; i < 30; i++)
+		{
+            GameObject go = Instantiate(Resources.Load("Prefabs/UI/InventorySlot"), GameObject.Find("InventorySlotHolder").transform) as GameObject;
+		}
+
         _inventorySlotHolder = GameObject.Find("InventorySlotHolder");
         _inventorySlotsUI = _inventorySlotHolder.GetComponentsInChildren<UI_InventorySlot>();
         _inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<Inventory>();
@@ -41,6 +46,7 @@ public class UI_Inventory : MonoBehaviour
         for(int i = 0; i < _inventorySlotsUI.Length; i++)
 		{
             _inventorySlotsUI[i].SetItem(_inventory.InventorySlots[i].Item);
+            _inventorySlotsUI[i].SetCount(_inventory.InventorySlots[i]._stackableAmount);
 		}
 	}
 

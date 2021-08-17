@@ -6,4 +6,9 @@ public class SpawnManager
 {
     [SerializeField]
     GameObject[] _spawnedMonsters;
+
+    public void Init()
+	{
+
+	}
 }

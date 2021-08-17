@@ -14,17 +14,14 @@ public enum ItemType
 [Serializable]
 public abstract class ItemData : ScriptableObject
 {
-    [SerializeField] static int _idNum = 0;
+    static int _idNum = 0;
 
-    [SerializeField] public ItemType _itemType = ItemType.Default;
-    [SerializeField] public int _id;
-    [SerializeField] public string _name;
-    [SerializeField] public Sprite _itemImage;
-    [SerializeField] public GameObject _model;
-    [SerializeField] [TextArea(5, 20)] public string _description;
-
-	private void OnEnable()
-	{
-        _id = _idNum++;
-	}
+    public ItemType _itemType = ItemType.Default;
+    public int _id;
+    public string _name;
+    public Sprite _itemImage;
+    public GameObject _model;
+    [TextArea(5, 20)] public string _description;
+    public bool _isStackable;
+    public int _stackedAmount = 0;
 }

@@ -13,11 +13,13 @@ public enum EquipmentType
 [CreateAssetMenu(fileName = "New EquipmentData", menuName = "Scriptables/Item/Equipment", order = 0)]
 public class EquipmentData : ItemData
 {
-    [SerializeField] public EquipmentType _equipmentType;
-    [SerializeField] public StatModifier[] _statModifiers;
+    public EquipmentType _equipmentType;
+    public StatModifier[] _statModifiers;
 
 	private void OnEnable()
 	{
+        _isStackable = false;
+        _itemType = ItemType.Equipment;
         for (int i = 0; i < _statModifiers.Length; i++)
         {
             _statModifiers[i]._source = this;

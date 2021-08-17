@@ -1,6 +1,17 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 
+public enum PlayerState
+{
+    Idle,
+    Move,
+    SetTarget,
+    Chase,
+    Attack,
+    Dead,
+    Num,
+}
+
 public class PlayerController : MonoBehaviour
 {
     // 애니메이션
@@ -13,26 +24,22 @@ public class PlayerController : MonoBehaviour
 
     // 이동 구현
     Vector3[] _corners;
-    int _cornerNum = 0;
+    int _cornerNum = 1;
     float _arriveOffset = 0.2f;
 
     float _rotSpeed = 10f;
     float _moveSpeed = 7f;
 
     // 자동 전투
-    bool _isAutoMode = false;
+    [SerializeField] bool _isAutoMode = true;
     public GameObject _target;
-    float _attackRange = 0.5f;
+    MonsterAI _targetAI;
+    float _attackRange = 1f;
 
-    public enum PlayerState
-    {
-        Idle,
-        Move,
-        Combat,
-        Dead,
-    }
+    [SerializeField] PlayerState _state = PlayerState.Idle;
 
-    PlayerState _state = PlayerState.Idle;
+    [SerializeField] AnimationClip[] _animationClips;
+    [SerializeField] SkillHolder _skillHolder;
 
     // Start is called before the first frame update
     void Start()
@@ -41,6 +48,10 @@ public class PlayerController : MonoBehaviour
         _path = new NavMeshPath();
         
         _destination = transform.position;
+
+        _animationClips = _animator.runtimeAnimatorController.animationClips;
+
+        _skillHolder = GetComponent<SkillHolder>();
     }
 
     // Update is called once per frame
@@ -49,6 +60,12 @@ public class PlayerController : MonoBehaviour
         UpdateClick();
         ProcessState();
     }
+
+    public void AutoMode()
+	{
+        ChangeState(PlayerState.SetTarget);
+    }
+
     void ProcessState()
     {
         //Debug.Log(_state);
@@ -60,8 +77,14 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Move:
                 UpdateMove();
                 break;
-            case PlayerState.Combat:
-                UpdateCombat();
+            case PlayerState.SetTarget:
+                UpdateSetTarget();
+                break;
+            case PlayerState.Chase:
+                UpdateChase();
+                break;
+            case PlayerState.Attack:
+                UpdateAttack();
                 break;
             case PlayerState.Dead:
                 UpdateDead();
@@ -82,14 +105,37 @@ public class PlayerController : MonoBehaviour
                 _animator.CrossFade("RUN", 0.1f);
                 _state = PlayerState.Move;
                 break;
-            case PlayerState.Combat:
-                _state = PlayerState.Combat;
+            case PlayerState.SetTarget:
+                _state = PlayerState.SetTarget;
+                break;
+            case PlayerState.Chase:
+                _animator.CrossFade("RUN", 0.1f);
+                _state = PlayerState.Chase;
+                break;
+            case PlayerState.Attack:
+                _state = PlayerState.Attack;
                 break;
             case PlayerState.Dead:
                 _state = PlayerState.Dead;
                 break;
         }
     }
+
+    AnimationClip GetAnimationClip(string animName)
+	{
+        AnimationClip clip = new AnimationClip();
+
+        for(int i = 0; i < _animationClips.Length; i++)
+		{
+            if(_animationClips[i].name == animName)
+			{
+                clip = _animationClips[i];
+                break;
+			}
+		}
+
+        return clip;
+	}
 
 	#region UpdateIdle
 	void UpdateIdle()
@@ -103,79 +149,147 @@ public class PlayerController : MonoBehaviour
     {
         if (HasArrivedTo(_destination))
         {
+            _cornerNum = 1;
             ChangeState(PlayerState.Idle);
             return;
         }
         Move();
     }
-	#endregion
+    #endregion
 
+    #region UpdateSetTarget
 
-	#region UpdateCombat
-	[SerializeField]
-    GameObject[] _testEnemy;
-    int _testNum = 0;
-
-    void UpdateCombat()
-    {
-        if (_target == null)
-        {
-            if (_isAutoMode)
-            {
-                SetNewTarget();
-                return;
-            }
-            Debug.Log("Combat Target is NULL");
-            ChangeState(PlayerState.Idle);
-            return;
-        }
-
-        if (IsTargetInRange(_target))
-        {
-            Attack();
-        }
-        else
-        {
-            MoveToTarget();
-        }
+    void UpdateSetTarget()
+	{
+        EmptyTarget();
+        SetNewTarget();
+        ChangeState(PlayerState.Chase);
+        return;
     }
 
     void SetNewTarget()
     {
-        if(_testEnemy[_testNum + 1] != null)
-            _target = _testEnemy[++_testNum];
+        _target = Spawners.Instance.GetClosestMonster();
+        _targetAI = _target.GetComponent<MonsterAI>();
+
+        GameObject targetMark = Pools.Instance.PoolDict[PoolType.TargetMark].Dequeue(_target.transform.position, _target.transform);
+        targetMark.transform.position += Vector3.up * 0.1f;
+        targetMark.transform.rotation = Quaternion.Euler(90, 0, 0);
+
+        //targetMark.transform.SetParent(_target.transform);
+        if (_target == null)
+            Debug.Log("Couldn't Set New Target");
+    }
+
+    void SetNewTarget(GameObject target)
+    {
+        _target = target;
+        _targetAI = _target.GetComponent<MonsterAI>();
+
+        GameObject targetMark = Pools.Instance.PoolDict[PoolType.TargetMark].Dequeue(_target.transform.position, _target.transform);
+        targetMark.transform.position += Vector3.up * 0.1f;
+        targetMark.transform.rotation = Quaternion.Euler(90, 0, 0);
+
+        //targetMark.transform.SetParent(_target.transform);
+        if (_target == null)
+            Debug.Log("Couldn't Set New Target");
+    }
+
+    public void EmptyTarget()
+	{
+        _target = null;
+        _targetAI = null;
+	}
+    #endregion
+
+
+    #region UpdateChase
+    void UpdateChase()
+    {
+        if (IsTargetInRange(_target))
+        {
+            _cornerNum = 1;
+            ChangeState(PlayerState.Attack);
+            return;
+        }
+        else
+        {
+            if(_skillHolder.IsAnimPlaying == false)
+                MoveToTarget();
+        }
     }
 
     bool IsTargetInRange(GameObject target)
     {
+        if(target == null)
+		{
+            Debug.Log($"Target is NULL!! {gameObject.name}");
+            return false;
+		}
+
         if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z),
             new Vector2(target.transform.position.x, target.transform.position.z)) <= _attackRange)
             return true;
         return false;
     }
 
-    void Attack()
-    {
-        // 쿨타임 따라 스킬
-        Debug.Log("Attack Confirmed!");
-    }
-
     void MoveToTarget()
 	{
-        if(_target == null)
-		{
-            Debug.Log("MoveToTarget _target null");
-            return;
-		}
-
         SetPath(_target.transform.position);
-        _animator.CrossFade("RUN", 0.1f);
         Move();
 	}
 	#endregion
 
-	#region UpdateDead
-	void UpdateDead()
+	#region UpdateAttack
+    void UpdateAttack()
+	{
+        if (_target == null)
+        {
+            if (_skillHolder.IsAnimPlaying == false)
+            {
+                ChangeState(PlayerState.SetTarget);
+                return;
+            }
+        }
+        else
+        {
+            if (_targetAI.State == MonsterState.Dead)
+            {
+                if (_skillHolder.IsAnimPlaying == false)
+                {
+                    if (_isAutoMode)
+                    {
+                        ChangeState(PlayerState.SetTarget);
+                    }
+                    else
+                    {
+                        ChangeState(PlayerState.Idle);
+                    }
+                    return;
+                }
+            }
+            else
+            {
+                if (IsTargetInRange(_target) == false)
+                {
+                    if (_skillHolder.IsAnimPlaying == false)
+                    {
+                        ChangeState(PlayerState.Chase);
+                        return;
+                    }
+                }
+                else
+                {
+                    LookAtTarget(_target.transform.position);
+                    _skillHolder.AutoMode();
+                }
+            }
+        }
+	}
+    #endregion
+
+    #region UpdateDead
+    void UpdateDead()
     {
 
     }
@@ -196,7 +310,7 @@ public class PlayerController : MonoBehaviour
 
     void UpdateClick()
 	{
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))// && _skillHolder.IsAnimPlaying == false)
         {
             if (Utils.IsUIHit())
             {
@@ -208,6 +322,12 @@ public class PlayerController : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit))
             {
+                if (_target != null)
+                {
+                    if (_state == PlayerState.Attack || _state == PlayerState.Chase)
+                        _target.GetComponent<MonsterAI>().RemoveTargetMark();
+                }
+
                 if (hit.transform.tag == "Ground")
                 {
                     SetPath(hit.point);
@@ -217,26 +337,37 @@ public class PlayerController : MonoBehaviour
                 else if (hit.transform.tag == "Enemy")
                 {
                     Debug.Log("Enemy Clicked");
-                    SetTarget(hit.transform.gameObject);
-                    ChangeState(PlayerState.Combat);
+                    SetNewTarget(hit.transform.gameObject);
+                    ChangeState(PlayerState.Chase);
                     return;
                 }
             }
         }
 	}
 
-    void SetTarget(GameObject target)
-	{
-        _target = target;
-	}
-
     void SetPath(Vector3 destination)
 	{
-        _cornerNum = 1;
-        _destination = new Vector3(destination.x, transform.position.y, destination.z);
+		_destination = new Vector3(destination.x, transform.position.y, destination.z);
         if (NavMesh.CalculatePath(transform.position, _destination, NavMesh.AllAreas, _path))
         {
-            _corners = _path.corners;
+            if (_path.corners.Length == 2)
+            {
+                _corners = _path.corners;
+                _cornerNum = 1;
+            }
+            else
+			{
+                if(_cornerNum < 2)
+				{
+                    _corners = _path.corners;
+                    _cornerNum = 1;
+				}
+                else
+				{
+                    _corners = _path.corners;
+				}
+			}
+            //Debug.Log($"cornernum : {_corners.Length}");
             return;
         }
     }
@@ -245,18 +376,26 @@ public class PlayerController : MonoBehaviour
 	{
         if (_corners != null && _corners.Length > 0)
         {
-            _targetPos = _corners[_cornerNum];
             LookAtTarget(_targetPos);
-            //if (HasArrivedTo(destination) && _currentState != STATE.ATTACK)
-            //{
-            //    StayStill();
-            //    ChangeState(STATE.IDLE);
-            //    return;
-            //}
-            if (!HasArrivedTo(_destination) && HasArrivedTo(_corners[_cornerNum]))
-                _cornerNum++;
-            else if (!HasArrivedTo(_destination))
+            _targetPos = _corners[_cornerNum];
+
+            if(!HasArrivedTo(_destination))
+			{
+                if(HasArrivedTo(_corners[_cornerNum]))
+				{
+                    if (_cornerNum <= _corners.Length - 1)
+                        _cornerNum++;
+                }
                 transform.position += (_corners[_cornerNum] - transform.position).normalized * Time.deltaTime * _moveSpeed;
+			}
+
+            //if (!HasArrivedTo(_destination) && HasArrivedTo(_corners[_cornerNum]))
+            //{
+            //    if (_cornerNum <= _corners.Length - 1)
+            //        _cornerNum++;
+            //}
+            //else if (!HasArrivedTo(_destination))
+            //    transform.position += (_corners[_cornerNum] - transform.position).normalized * Time.deltaTime * _moveSpeed;
         }
     }
 

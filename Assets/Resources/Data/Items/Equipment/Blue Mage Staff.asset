@@ -13,12 +13,17 @@ MonoBehaviour:
   m_Name: Blue Mage Staff
   m_EditorClassIdentifier: 
   _itemType: 0
-  _id: 0
-  _name: Blue Mage Staff
+  _id: 7
+  _name: "\uCCAD\uB9C8\uBC95\uC0AC\uC758 \uC2A4\uD0DC\uD504"
   _itemImage: {fileID: 21300000, guid: 98ada1e6cb5d7d341b5f624f13510bf2, type: 3}
   _model: {fileID: 0}
-  _description: 
+  _description: "\uD478\uB978 \uB9C8\uBC95\uC0AC\uB4E4\uC774\n\uC560\uC6A9\uD558\uB294
+    \uC9C0\uD321\uC774"
+  _isStackable: 0
+  _stackedAmount: 0
   _equipmentType: 3
   _statModifiers:
   - _statType: 4
+    _modValue: 50
+  - _statType: 1
     _modValue: 50

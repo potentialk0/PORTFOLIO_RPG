@@ -13,11 +13,14 @@ MonoBehaviour:
   m_Name: Warrior Helmet
   m_EditorClassIdentifier: 
   _itemType: 0
-  _id: 15
-  _name: Warrior Helmet
+  _id: 14
+  _name: "\uC804\uC0AC\uC758 \uD22C\uAD6C"
   _itemImage: {fileID: 21300000, guid: 4ac3874c6680581498dac82c75a7582f, type: 3}
   _model: {fileID: 0}
-  _description: 
+  _description: "\uC804\uC0AC\uB4E4\uC5D0\uAC8C \uC5B4\uC6B8\uB9AC\uB294\n\uB2E8\uB2E8\uD55C
+    \uD22C\uAD6C"
+  _isStackable: 0
+  _stackedAmount: 0
   _equipmentType: 0
   _statModifiers:
   - _statType: 3

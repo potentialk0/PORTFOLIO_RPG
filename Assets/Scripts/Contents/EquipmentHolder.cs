@@ -21,6 +21,8 @@ public class EquipmentHolder : MonoBehaviour
 
     [SerializeField] StatContainer _statContainer;
 
+    [SerializeField] UI_Player _playerUI;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -60,7 +62,10 @@ public class EquipmentHolder : MonoBehaviour
                     onEquip(equipment);
 
                 if (changeEquipmentUI != null)
+                {
                     changeEquipmentUI();
+                    _playerUI.RefreshHP();
+                }
 
                 return;
 			}
@@ -74,8 +79,11 @@ public class EquipmentHolder : MonoBehaviour
 
         _equipmentSlots[(int)equipmentType].EquipmentData = null;
 
-        if(changeEquipmentUI != null)
+        if (changeEquipmentUI != null)
+        {
             changeEquipmentUI();
+            _playerUI.RefreshHP();
+        }
 	}
 
     public EquipmentData GetEquipmentData(EquipmentType equipmentType)

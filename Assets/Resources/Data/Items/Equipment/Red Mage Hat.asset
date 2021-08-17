@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Red Mage Hat
   m_EditorClassIdentifier: 
   _itemType: 0
-  _id: 3
-  _name: Red Mage Hat
+  _id: 10
+  _name: "\uC801\uB9C8\uBC95\uC0AC\uC758 \uBAA8\uC790"
   _itemImage: {fileID: 21300000, guid: d847121775977de4899c828013efe4d0, type: 3}
   _model: {fileID: 0}
   _description: "\uBD89\uC740 \uB9C8\uBC95\uC0AC\uC758 \uD798\uC744\n\uBC1B\uC740

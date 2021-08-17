@@ -50,13 +50,21 @@ public class StatContainer : MonoBehaviour
 
 	#region StatChange
 
-    public void GetDamage(StatContainer statContainer)
+    public void GetDamageFrom(StatContainer statContainer)
 	{
         float damage = (statContainer._stats[(int)StatType.Strength]._currentValue
             - _stats[(int)StatType.Defense]._currentValue);
         if (damage < 0) damage = 0;
 
-        _currHP -= damage;
+        if (_currHP - damage < 0)
+            _currHP = 0;
+        else
+            _currHP -= damage;
+	}
+
+    public void Heal(int amount)
+	{
+        _currHP += amount;
 	}
 
 	#endregion
